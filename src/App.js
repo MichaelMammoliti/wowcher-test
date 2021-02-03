@@ -1,51 +1,11 @@
 import React, { Component } from "react";
 
-import fetchData from './api';
+import { mergeProducts, getFilteredProducts, getTotal } from './utilities';
+import * as ProductAPI from './api';
+
+import ProductItem from './components/ProductItem.js';
 
 import "./App.css";
-
-const ProductItem = ({ productData }) => (
-  productData.map((productItem) => (
-    <tr key={productItem.name}>
-      <td>{productItem.name}</td>
-      <td>{formatNumber(productItem.unitPrice * productItem.sold)}</td>
-    </tr>
-  )
-));
-
-const formatNumber = (number) => new Intl.NumberFormat("en", { minimumFractionDigits: 2 }).format(number);
-
-const sortProductsByName = (a, b) => (a.name < b.name) ? -1 : 1;
-
-const getFilteredProducts = (filter, products) => {
-  return products.filter((product) => {
-    return product.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
-  });
-}
-
-export const mergeProducts = (products) => {
-  const newProducts = products.flat().reduce((acc, productItem) => {
-    if (!acc[productItem.name]) {
-      acc[productItem.name] = {...productItem};
-    } else {
-      acc[productItem.name].sold = acc[productItem.name].sold + productItem.sold;
-    }
-
-    return acc;
-  }, {});
-
-  return Object.values(newProducts).sort(sortProductsByName);
-};
-
-export const getTotal = (products) => {
-  const total = products.reduce((acc, productItem) => {
-    const totalSold = productItem.unitPrice * productItem.sold;
-
-    return acc + totalSold;
-  }, 0);
-
-  return formatNumber(total);
-};
 
 class App extends Component {
   constructor(props) {
@@ -54,6 +14,7 @@ class App extends Component {
     this.state = {
       products: [],
       filter: '',
+      fetchProductsRequestStatus: '',
     };
 
     this.fetchProductsFulfilled = this.fetchProductsFulfilled.bind(this);
@@ -61,6 +22,18 @@ class App extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
+  // Lifecycle Events
+  // =============================================
+  componentDidMount() {
+    this.fetchProductsPending();
+
+    ProductAPI.fetchProducts()
+      .then(this.fetchProductsFulfilled)
+      .catch(this.fetchProductsRejected)
+  }
+
+  // Async
+  // =============================================
   fetchProductsPending() {
     this.setState({
       fetchProductsRequestStatus: 'pending',
@@ -84,28 +57,34 @@ class App extends Component {
     });
   }
 
-  componentDidMount() {
+  fetchProducts() {
     this.fetchProductsPending();
 
-    fetchData()
+    ProductAPI.fetchProducts()
       .then(this.fetchProductsFulfilled)
-      .catch(this.fetchDataRejected)
+      .catch(this.fetchProductsRejected);
   }
 
+  // DOM Events
+  // =============================================
   handleInputChange(event) {
     this.setState({
       filter: event.target.value,
     });
   }
 
+  // Utilties
+  // =============================================
   getProducts() {
     const { filter, products } = this.state;
 
     const newProducts = filter ? getFilteredProducts(filter, products) : products;
 
     return newProducts;
-  }
+  };
 
+  // Render
+  // =============================================
   render() {
     const { fetchProductsRequestStatus } = this.state;
 
@@ -117,8 +96,8 @@ class App extends Component {
 
     return (
       <div className="product-list">
-        <label>Search Products</label>
-        <input type="text" onChange={this.handleInputChange} />
+        <label htmlFor="search">Search Products</label>
+        <input type="text" id="search" onChange={this.handleInputChange} />
 
         <table>
         <thead>

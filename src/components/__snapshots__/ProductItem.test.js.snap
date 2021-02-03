@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProductItem should render correctly 1`] = `
+<tr
+  key="somethig"
+>
+  <td>
+    somethig
+  </td>
+  <td>
+    100.00
+  </td>
+</tr>
+`;

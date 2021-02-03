@@ -1,4 +1,4 @@
-const fetchData = () => {
+export const fetchProducts = () => {
   const promises = [
     fetch('api/branch1.json').then(r => r.json()),
     fetch('api/branch2.json').then(r => r.json()),
@@ -6,6 +6,4 @@ const fetchData = () => {
   ];
 
   return Promise.all(promises);
-}
-
-export default fetchData;
+};
