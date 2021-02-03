@@ -88,3 +88,68 @@ it("filters the displayed products", async () => {
   expect(app.find("table")).toMatchSnapshot();
   expect(app.find("tfoot td:last-child").text()).toEqual("60,681.02");
 });
+
+
+
+it('calculated products', () => {
+  const products = [
+    {
+      "id": "039",
+      "name": "Cactus Pear",
+      "unitPrice": 14.48,
+      "sold": 604
+    },
+    {
+      "id": "040",
+      "name": "aaa",
+      "unitPrice": 2,
+      "sold": 2
+    },
+    {
+      "id": "039",
+      "name": "Cactus Pear",
+      "unitPrice": 14.48,
+      "sold": 862
+    },
+  ];
+
+  const expected = [
+    {
+      "id": "039",
+      "name": "Cactus Pear",
+      "unitPrice": 14.48,
+      "sold": 1466,
+    },
+    {
+      "id": "040",
+      "name": "aaa",
+      "unitPrice": 2,
+      "sold": 2
+    },
+  ]
+  expect(mergeProducts(products)).toEqual(expected);
+});
+
+it('getTotal', () => {
+  const products = [
+    {
+      id: '000',
+      unitPrice: 10,
+      sold: 10,
+    },
+    {
+      id: '000',
+      unitPrice: 10,
+      sold: 20,
+    },
+    {
+      id: '000',
+      unitPrice: 10,
+      sold: 30,
+    },
+  ];
+
+  const expected = "600.00";
+
+  expect(getTotal(products)).toEqual(expected);
+});
