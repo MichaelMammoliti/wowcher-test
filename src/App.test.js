@@ -89,8 +89,6 @@ it("filters the displayed products", async () => {
   expect(app.find("tfoot td:last-child").text()).toEqual("60,681.02");
 });
 
-
-
 it('calculated products', () => {
   const products = [
     {
